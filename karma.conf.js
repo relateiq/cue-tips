@@ -6,8 +6,6 @@ module.exports = function(config) {
 
         basePath: '',
 
-        files: [],
-
         autoWatch: true,
 
         reporters: ['progress', 'notify'],

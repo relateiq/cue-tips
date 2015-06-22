@@ -3,7 +3,6 @@
 {
     "plugins": [
         "riq",
-        "angular",
         "jasmine"
     ],
     "rules": {
@@ -154,7 +153,6 @@
 
     // additional predefined global variables
     "globals": {
-        "angular":         false,
         "d3":              false,
         "crossfilter":     false,
         "q$":              false,
