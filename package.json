@@ -17,10 +17,13 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/relateiq/see-spots.git"
+        "url": "git+https://github.com/relateiq/cue-tips.git"
     },
     "bugs": {
-        "url": "https://github.com/relateiq/see-spots/issues"
+        "url": "https://github.com/relateiq/cue-tips/issues"
     },
-    "homepage": "https://github.com/relateiq/see-spots#readme"
+    "homepage": "https://github.com/relateiq/cue-tips#readme",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
 }
