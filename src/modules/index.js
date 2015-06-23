@@ -98,11 +98,15 @@ function removeCueConfig(cueConfig, props) {
     var i = props.cueConfigArray.indexOf(cueConfig);
 
     if (~i) {
+        var doRemove = true;
+
         if (typeof props.onRemove === 'function') {
-            props.onRemove(cueConfig);
+            doRemove = props.onRemove(cueConfig);
         }
 
-        props.cueConfigArray.splice(i, 1);
+        if (doRemove !== false) {
+            props.cueConfigArray.splice(i, 1);
+        }
     }
 
     maybeDisconnectObserver(props);
