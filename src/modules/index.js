@@ -1,4 +1,4 @@
-var CUE_TIPS_CUE_CLASS = 'cue-tups-cue';
+var CUE_TIPS_CUE_CLASS = 'cue-tips-cue';
 
 module.exports = make;
 
@@ -24,32 +24,55 @@ function registerObserver(cueConfigArray, tipInterface) {
 
         props.observer = new MutationObserver(mutationHandler.bind(this, props));
 
-        props.observer.observe(document.documentElement, {
-            attributes: true,
+        props.observer.observe(document.body, {
             childList: true,
-            subtree: true,
-            attributeFilter: attributes
+            subtree: true
         });
     }
 }
 
 function mutationHandler(props, mutations) {
-    mutations.forEach(onMutation.bind(this, props));
+    var attributes = getAttributes(props.cueConfigArray);
+    var querySelector = '[' + attributes.join('],[') + ']';
+
+    mutations.forEach(function forEachCueTipMutation(mutation) {
+        if (!mutation.addedNodes || !mutation.addedNodes.length) {
+            return;
+        }
+
+        Array.prototype.slice.call(mutation.addedNodes).forEach(function forEachCueTipAddedNode(node) {
+            if (node.nodeType !== 1) {
+                return;
+            }
+
+            maybeHandleAttributeMatchesForNode(node, attributes, props);
+
+            Array.prototype.slice.call(node.querySelectorAll(querySelector)).forEach(function forEachCueTipAddedNodeDescendant(descendant) {
+                maybeHandleAttributeMatchesForNode(descendant, attributes, props);
+            });
+        });
+    });
 }
 
-function onMutation(props, mutation) {
-    // the hasAttribute check might be unnecessary since we use attributeFilter in the observer
-    if (mutation.attributeName && mutation.target.hasAttribute(mutation.attributeName)) {
-        var cueConfig = findCueConfigForAttribute(mutation.attributeName, props);
+function maybeHandleAttributeMatchesForNode(node, attributes, props) {
+    attributes.some(function(attr) {
+        if (node.hasAttribute(attr)) {
+            handleAttributeMatch(attr, node, props);
+            return true;
+        }
+    });
+}
 
-        if (cueConfig) {
-            if (cueConfig.cueAttr === mutation.attributeName) {
-                addCue(mutation.target, cueConfig, props);
-            } else if (cueConfig.cueTipAttr === mutation.attributeName) {
-                showCueTip(mutation.target, cueConfig, props);
-            } else {
-                throw new Error('cue-tips: invalid cue config for attribute "' + mutation.attributeName + '"');
-            }
+function handleAttributeMatch(attr, target, props) {
+    var cueConfig = findCueConfigForAttribute(attr, props);
+
+    if (cueConfig) {
+        if (cueConfig.cueAttr === attr) {
+            addCue(target, cueConfig, props);
+        } else if (cueConfig.cueTipAttr === attr) {
+            showCueTip(target, cueConfig, props);
+        } else {
+            throw new Error('cue-tips: invalid cue config for attribute "' + attr + '"');
         }
     }
 }
@@ -73,7 +96,7 @@ function removeCueConfig(cueConfig, props) {
 }
 
 function maybeDisconnectObserver(props) {
-    if (props.cueConfigArray.length) {
+    if (!props.cueConfigArray.length) {
         props.observer.disconnect();
     }
 }
@@ -105,6 +128,8 @@ function getAttributes(cueConfigArray) {
 function extendDefaultTipInterface(tipInterface) {
     tipInterface.showCueTargetTip = tipInterface.showCueTargetTip || noop;
     tipInterface.hideCueTargetTip = tipInterface.hideCueTargetTip || noop;
+
+    return tipInterface;
 }
 
 function assertValidCueConfigArray(cueConfigArray) {
@@ -135,8 +160,12 @@ function assertValidCueConfigArray(cueConfigArray) {
 
 function assertValidTipInterface(tipInterface) {
     if (isObject(tipInterface)) {
-        ['showCueTip', 'showCueTargetTip', 'hideCueTargetTip'].forEach(function(fn) {
-            throw new Error('cue-tips: tipInterface requires a ' + fn + ' function');
+        return ['showCueTip', 'showCueTargetTip', 'hideCueTargetTip'].every(function(fnName) {
+            if (typeof tipInterface[fnName] === 'function') {
+                return true;
+            } else {
+                throw new Error('cue-tips: tipInterface requires a ' + fnName + ' function');
+            }
         });
     } else {
         throw new Error('cue-tips: invalid tipInterface');
