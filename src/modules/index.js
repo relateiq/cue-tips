@@ -79,11 +79,19 @@ function handleAttributeMatch(attr, target, props) {
 }
 
 function addCue(target, cueConfig, props) {
+    if (cueConfig.cueParentSelector && !findParentBySelector(target, cueConfig.cueParentSelector)) {
+        return;
+    }
+
     target.classList.add(CUE_TIPS_CUE_CLASS);
     props.tipInterface.showCueTargetTip(cueConfig, target);
 }
 
 function showCueTip(target, cueConfig, props) {
+    if (cueConfig.cueTipParentSelector && !findParentBySelector(target, cueConfig.cueTipParentSelector)) {
+        return;
+    }
+
     var cueEl = document.querySelector('.' + CUE_TIPS_CUE_CLASS);
     props.tipInterface.hideCueTargetTip(cueConfig);
     props.tipInterface.showCueTip(cueConfig, target);
@@ -129,6 +137,18 @@ function findCueConfigForAttribute(attributeName, props) {
     });
 
     return result;
+}
+
+function findParentBySelector(el, parentSelector) {
+    var p = el;
+
+    while ((p = el.parentElement)) {
+        if (p.matches(parentSelector)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function getAttributes(cueConfigArray) {
