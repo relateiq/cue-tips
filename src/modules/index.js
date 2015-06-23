@@ -2,24 +2,25 @@ var CUE_TIPS_CUE_CLASS = 'cue-tips-cue';
 
 module.exports = make;
 
-function make(cueConfigArray, tipInterface) {
+function make(cueConfigArray, tipInterface, onRemove) {
     var isValidConfig = assertValidCueConfigArray(cueConfigArray);
     tipInterface = extendDefaultTipInterface(tipInterface);
     cueConfigArray = cueConfigArray.slice(); // make a copy
     var isValidTipInterface = assertValidTipInterface(tipInterface);
 
     if (isValidConfig && isValidTipInterface) {
-        registerObserver(cueConfigArray, tipInterface);
+        registerObserver(cueConfigArray, tipInterface, onRemove);
     }
 }
 
-function registerObserver(cueConfigArray, tipInterface) {
+function registerObserver(cueConfigArray, tipInterface, onRemove) {
     var attributes = getAttributes(cueConfigArray);
 
     if (attributes.length) {
         var props = {
             cueConfigArray: cueConfigArray,
-            tipInterface: tipInterface
+            tipInterface: tipInterface,
+            onRemove: onRemove
         };
 
         props.observer = new MutationObserver(mutationHandler.bind(this, props));
@@ -95,7 +96,15 @@ function showCueTip(target, cueConfig, props) {
 
 function removeCueConfig(cueConfig, props) {
     var i = props.cueConfigArray.indexOf(cueConfig);
-    props.cueConfigArray.splice(i, 1);
+
+    if (~i) {
+        if (typeof props.onRemove === 'function') {
+            props.onRemove(cueConfig);
+        }
+
+        props.cueConfigArray.splice(i, 1);
+    }
+
     maybeDisconnectObserver(props);
 }
 
