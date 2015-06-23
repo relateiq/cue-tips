@@ -92,7 +92,7 @@ function showCueTip(target, cueConfig, props) {
         return;
     }
 
-    var cueSelector = (cueConfig.cueParentSelector + ' ' + cueConfig.cueAttr).trim();
+    var cueSelector = ((cueConfig.cueParentSelector || '') + ' [' + cueConfig.cueAttr + ']').trim();
     var cueEl = document.querySelector(cueSelector);
     props.tipInterface.hideCueTargetTip(cueConfig);
     props.tipInterface.showCueTip(cueConfig, target);
