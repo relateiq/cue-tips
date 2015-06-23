@@ -83,10 +83,14 @@ function addCue(target, cueConfig, props) {
 }
 
 function showCueTip(target, cueConfig, props) {
+    var cueEl = document.querySelector('.' + CUE_TIPS_CUE_CLASS);
     props.tipInterface.hideCueTargetTip(cueConfig);
     props.tipInterface.showCueTip(cueConfig, target);
-    target.classList.remove(CUE_TIPS_CUE_CLASS);
     removeCueConfig(cueConfig, props);
+
+    if (cueEl) {
+        cueEl.classList.remove(CUE_TIPS_CUE_CLASS);
+    }
 }
 
 function removeCueConfig(cueConfig, props) {
