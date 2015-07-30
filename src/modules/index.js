@@ -20,8 +20,13 @@ function registerObserver(cueConfigArray, tipInterface, onRemove) {
         var props = {
             cueConfigArray: cueConfigArray,
             tipInterface: tipInterface,
+            attributes: attributes,
+            attrQuerySelector: getAttributeQuerySelector(attributes),
             onRemove: onRemove
         };
+
+        // look through the current state of the body first (the mutation observer will miss these)
+        findCueTipsForAddedNode(props, document.body);
 
         props.observer = new MutationObserver(mutationHandler.bind(this, props));
 
@@ -33,30 +38,32 @@ function registerObserver(cueConfigArray, tipInterface, onRemove) {
 }
 
 function mutationHandler(props, mutations) {
-    var attributes = getAttributes(props.cueConfigArray);
-    var querySelector = '[' + attributes.join('],[') + ']';
-
     mutations.forEach(function forEachCueTipMutation(mutation) {
         if (!mutation.addedNodes || !mutation.addedNodes.length) {
             return;
         }
 
-        Array.prototype.slice.call(mutation.addedNodes).forEach(function forEachCueTipAddedNode(node) {
-            if (node.nodeType !== 1) {
-                return;
-            }
-
-            maybeHandleAttributeMatchesForNode(node, attributes, props);
-
-            Array.prototype.slice.call(node.querySelectorAll(querySelector)).forEach(function forEachCueTipAddedNodeDescendant(descendant) {
-                maybeHandleAttributeMatchesForNode(descendant, attributes, props);
-            });
-        });
+        Array.prototype.slice.call(mutation.addedNodes).forEach(findCueTipsForAddedNode.bind(null, props));
     });
 }
 
-function maybeHandleAttributeMatchesForNode(node, attributes, props) {
-    attributes.some(function(attr) {
+function findCueTipsForAddedNode(props, node) {
+    if (node.nodeType !== 1) {
+        return;
+    }
+
+    maybeHandleAttributeMatchesForNode(node, props);
+
+    // should only be falsy on last turn after removing mutation observer
+    if (props.attrQuerySelector) {
+        Array.prototype.slice.call(node.querySelectorAll(props.attrQuerySelector)).forEach(function forEachCueTipAddedNodeDescendant(descendant) {
+            maybeHandleAttributeMatchesForNode(descendant, props);
+        });
+    }
+}
+
+function maybeHandleAttributeMatchesForNode(node, props) {
+    props.attributes.some(function(attr) {
         if (node.hasAttribute(attr)) {
             handleAttributeMatch(attr, node, props);
             return true;
@@ -83,8 +90,15 @@ function addCue(target, cueConfig, props) {
         return;
     }
 
-    target.classList.add(CUE_TIPS_CUE_CLASS);
+    if (cueConfig.cueClass !== false) {
+        target.classList.add(CUE_TIPS_CUE_CLASS);
+    }
+
     props.tipInterface.showCueTargetTip(cueConfig, target);
+
+    if (!cueConfig.cueTipAttr) {
+        removeCueConfig(cueConfig, props);
+    }
 }
 
 function showCueTip(target, cueConfig, props) {
@@ -115,6 +129,8 @@ function removeCueConfig(cueConfig, props) {
 
         if (doRemove !== false) {
             props.cueConfigArray.splice(i, 1);
+            props.attributes = getAttributes(props.cueConfigArray);
+            props.attrQuerySelector = getAttributeQuerySelector(props.attributes);
         }
     }
 
@@ -157,7 +173,10 @@ function getAttributes(cueConfigArray) {
 
     cueConfigArray.forEach(function(obj) {
         result.push(obj.cueAttr);
-        result.push(obj.cueTipAttr);
+
+        if (obj.cueTipAttr) {
+            result.push(obj.cueTipAttr);
+        }
     });
 
     return result;
@@ -170,16 +189,20 @@ function extendDefaultTipInterface(tipInterface) {
     return tipInterface;
 }
 
+function getAttributeQuerySelector(attributes) {
+    if (!attributes || !attributes.length) {
+        return '';
+    } else {
+        return '[' + attributes.join('],[') + ']';
+    }
+}
+
 function assertValidCueConfigArray(cueConfigArray) {
     if (Array.isArray(cueConfigArray)) {
         var hasValidCueConfigs = cueConfigArray.every(function(obj) {
             if (isObject(obj)) {
                 if (!isStringWithValue(obj.cueAttr)) {
                     throw new Error('cue-tips: cue config require a `cueAttr` attribute selector');
-                }
-
-                if (!isStringWithValue(obj.cueTipAttr)) {
-                    throw new Error('cue-tips: cue config require a `cueTipAttr` attribute selector');
                 }
 
                 return true;
