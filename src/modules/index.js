@@ -9,14 +9,7 @@ function make(cueConfigArray, tipInterface, onRemove) {
     var isValidTipInterface = assertValidTipInterface(tipInterface);
 
     if (isValidConfig && isValidTipInterface) {
-        registerObserver(cueConfigArray, tipInterface, onRemove);
-    }
-}
-
-function registerObserver(cueConfigArray, tipInterface, onRemove) {
-    var attributes = getAttributes(cueConfigArray);
-
-    if (attributes.length) {
+        var attributes = getAttributes(cueConfigArray);
         var props = {
             cueConfigArray: cueConfigArray,
             tipInterface: tipInterface,
@@ -24,6 +17,14 @@ function registerObserver(cueConfigArray, tipInterface, onRemove) {
             attrQuerySelector: getAttributeQuerySelector(attributes),
             onRemove: onRemove
         };
+
+        registerObserver(props);
+        return getInstanceAPI(props);
+    }
+}
+
+function registerObserver(props) {
+    if (props.attributes.length) {
 
         // look through the current state of the body first (the mutation observer will miss these)
         findCueTipsForAddedNode(props, document.body);
@@ -35,6 +36,29 @@ function registerObserver(cueConfigArray, tipInterface, onRemove) {
             subtree: true
         });
     }
+}
+
+function getInstanceAPI(props) {
+    return {
+        add: function(cueConfig) {
+            if (!~props.cueConfigArray.indexOf(cueConfig) && assertValidCueConfigArray([cueConfig])) {
+                props.cueConfigArray.push(cueConfig);
+                props.attributes = getAttributes(props.cueConfigArray);
+                props.attrQuerySelector = getAttributeQuerySelector(props.attributes);
+
+                // look through the current state of the body
+                findCueTipsForAddedNode(props, document.body);
+            }
+        },
+        remove: function(cueConfig) {
+            removeCueConfig(cueConfig, props);
+        },
+        stop: function() {
+            if (props.observer) {
+                props.observer.disconnect();
+            }
+        }
+    };
 }
 
 function mutationHandler(props, mutations) {
@@ -171,13 +195,15 @@ function findParentBySelector(el, parentSelector) {
 function getAttributes(cueConfigArray) {
     var result = [];
 
-    cueConfigArray.forEach(function(obj) {
-        result.push(obj.cueAttr);
+    if (cueConfigArray) {
+        cueConfigArray.forEach(function(obj) {
+            result.push(obj.cueAttr);
 
-        if (obj.cueTipAttr) {
-            result.push(obj.cueTipAttr);
-        }
-    });
+            if (obj.cueTipAttr) {
+                result.push(obj.cueTipAttr);
+            }
+        });
+    }
 
     return result;
 }
