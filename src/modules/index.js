@@ -152,9 +152,14 @@ function removeCueConfig(cueConfig, props) {
         }
 
         if (doRemove !== false) {
-            props.cueConfigArray.splice(i, 1);
-            props.attributes = getAttributes(props.cueConfigArray);
-            props.attrQuerySelector = getAttributeQuerySelector(props.attributes);
+            // need to reevaluate index in case things have synchronously changed
+            i = props.cueConfigArray.indexOf(cueConfig);
+
+            if (~i) {
+                props.cueConfigArray.splice(i, 1);
+                props.attributes = getAttributes(props.cueConfigArray);
+                props.attrQuerySelector = getAttributeQuerySelector(props.attributes);
+            }
         }
     }
 
