@@ -188,7 +188,7 @@ function findCueConfigForAttribute(attributeName, props) {
 function findParentBySelector(el, parentSelector) {
     var p = el;
 
-    while ((p = el.parentElement)) {
+    while ((p = p.parentElement)) {
         if (p.matches(parentSelector)) {
             return true;
         }
