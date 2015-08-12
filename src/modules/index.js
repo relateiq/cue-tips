@@ -33,7 +33,8 @@ function registerObserver(props) {
 
         props.observer.observe(document.body, {
             childList: true,
-            subtree: true
+            subtree: true,
+            attributes: true
         });
     }
 }
@@ -63,11 +64,13 @@ function getInstanceAPI(props) {
 
 function mutationHandler(props, mutations) {
     mutations.forEach(function forEachCueTipMutation(mutation) {
-        if (!mutation.addedNodes || !mutation.addedNodes.length) {
-            return;
+        if (mutation.addedNodes && mutation.addedNodes.length) {
+            Array.prototype.slice.call(mutation.addedNodes).forEach(findCueTipsForAddedNode.bind(null, props));
+        } else if (mutation.type === 'attributes' && mutation.attributeName) {
+            if (~props.attributes.indexOf(mutation.attributeName)) {
+                maybeHandleAttributeMatchesForNode(mutation.target, props);
+            }
         }
-
-        Array.prototype.slice.call(mutation.addedNodes).forEach(findCueTipsForAddedNode.bind(null, props));
     });
 }
 
