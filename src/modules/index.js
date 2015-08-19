@@ -1,6 +1,9 @@
 var CUE_TIPS_CUE_CLASS = 'cue-tips-cue';
+var _observers = [];
 
 module.exports = make;
+module.exports._observers = _observers; // for testing
+module.exports._disconnectObserver = disconnectObserver; // for testing
 
 function make(cueConfigArray, tipInterface, onRemove) {
     var isValidConfig = assertValidCueConfigArray(cueConfigArray);
@@ -36,6 +39,8 @@ function registerObserver(props) {
             subtree: true,
             attributes: true
         });
+
+        _observers.push(props.observer);
     }
 }
 
@@ -55,10 +60,9 @@ function getInstanceAPI(props) {
             removeCueConfig(cueConfig, props);
         },
         stop: function() {
-            if (props.observer) {
-                props.observer.disconnect();
-            }
-        }
+            disconnectObserver(props.observer);
+        },
+        _props: props // for testing
     };
 }
 
@@ -171,7 +175,19 @@ function removeCueConfig(cueConfig, props) {
 
 function maybeDisconnectObserver(props) {
     if (!props.cueConfigArray.length) {
-        props.observer.disconnect();
+        disconnectObserver(props.observer);
+    }
+}
+
+function disconnectObserver(observer) {
+    if (observer) {
+        observer.disconnect();
+
+        var i = _observers.indexOf(observer);
+
+        if (~i) {
+            _observers.splice(i, 1);
+        }
     }
 }
 
