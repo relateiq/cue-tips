@@ -61,6 +61,7 @@ function getInstanceAPI(props) {
         },
         stop: function() {
             disconnectObserver(props.observer);
+            props.observer = null;
         },
         _props: props // for testing
     };
@@ -176,6 +177,7 @@ function removeCueConfig(cueConfig, props) {
 function maybeDisconnectObserver(props) {
     if (!props.cueConfigArray.length) {
         disconnectObserver(props.observer);
+        props.observer = null;
     }
 }
 
