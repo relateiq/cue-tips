@@ -48,12 +48,18 @@ function getInstanceAPI(props) {
     return {
         add: function(cueConfig) {
             if (!~props.cueConfigArray.indexOf(cueConfig) && assertValidCueConfigArray([cueConfig])) {
+                var needsNewObserver = !props.cueConfigArray.length;
+
                 props.cueConfigArray.push(cueConfig);
                 props.attributes = getAttributes(props.cueConfigArray);
                 props.attrQuerySelector = getAttributeQuerySelector(props.attributes);
 
-                // look through the current state of the body
-                findCueTipsForAddedNode(props, document.body);
+                if (needsNewObserver) {
+                    registerObserver(props);
+                } else {
+                    // look through the current state of the body
+                    findCueTipsForAddedNode(props, document.body);
+                }
             }
         },
         remove: function(cueConfig) {

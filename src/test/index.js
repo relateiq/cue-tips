@@ -68,10 +68,20 @@ describe('cue-tips', function() {
             var instance = cueTipsModule([{
                 cueAttr: 'test'
             }], this.tipInterfaceMock);
+            var observerObj = instance._props.observer;
 
-            spyOn(instance._props.observer, 'disconnect');
+            spyOn(observerObj, 'disconnect');
             instance.stop();
-            expect(instance._props.observer.disconnect).toHaveBeenCalled();
+            expect(observerObj.disconnect).toHaveBeenCalled();
+        });
+
+        it('should null out the observer when calling `stop`', function() {
+            var instance = cueTipsModule([{
+                cueAttr: 'test'
+            }], this.tipInterfaceMock);
+
+            instance.stop();
+            expect(instance._props.observer).toBe(null);
         });
 
         it('should disconnect the observer when calling the cueConfigArray becomes empty', function() {
@@ -79,14 +89,33 @@ describe('cue-tips', function() {
                 cueAttr: 'test'
             };
             var instance = cueTipsModule([cueConfig], this.tipInterfaceMock);
+            var observerObj = instance._props.observer;
 
-            spyOn(instance._props.observer, 'disconnect');
+            spyOn(observerObj, 'disconnect');
             expect(instance._props.cueConfigArray.length).toBe(1);
             expect(cueTipsModule._observers.indexOf(instance._props.observer)).toBe(0);
             instance.remove(cueConfig);
             expect(instance._props.cueConfigArray.length).toBe(0);
-            expect(instance._props.observer.disconnect).toHaveBeenCalled();
+            expect(observerObj.disconnect).toHaveBeenCalled();
+            expect(instance._props.observer).toBe(null);
             expect(cueTipsModule._observers.indexOf(instance._props.observer)).toBe(-1);
+        });
+
+        it('should register a new observer when `add` is called with no existing cueConfigs', function() {
+            var cueConfig1 = {
+                cueAttr: 'test'
+            };
+            var cueConfig2 = {
+                cueAttr: 'test2'
+            };
+            var instance = cueTipsModule([cueConfig1], this.tipInterfaceMock);
+
+            instance.remove(cueConfig1);
+            expect(instance._props.observer).toBe(null);
+            expect(cueTipsModule._observers.length).toBe(0);
+            instance.add(cueConfig2);
+            expect(instance._props.observer).not.toBe(null);
+            expect(cueTipsModule._observers.length).toBe(1);
         });
 
         it('should remove the observer from the _observer array when `stop` is called', function() {
