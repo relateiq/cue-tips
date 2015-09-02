@@ -79,7 +79,7 @@ function mutationHandler(props, mutations) {
             Array.prototype.slice.call(mutation.addedNodes).forEach(findCueTipsForAddedNode.bind(null, props));
         } else if (mutation.type === 'attributes' && mutation.attributeName) {
             if (~props.attributes.indexOf(mutation.attributeName)) {
-                maybeHandleAttributeMatchesForNode(mutation.target, props);
+                maybeHandleAttributeMatchesForNode(mutation.target, props, [mutation.attributeName]);
             }
         }
     });
@@ -100,11 +100,10 @@ function findCueTipsForAddedNode(props, node) {
     }
 }
 
-function maybeHandleAttributeMatchesForNode(node, props) {
-    props.attributes.some(function(attr) {
+function maybeHandleAttributeMatchesForNode(node, props, customAttributes) {
+    (customAttributes || props.attributes).forEach(function(attr) {
         if (node.hasAttribute(attr)) {
             handleAttributeMatch(attr, node, props);
-            return true;
         }
     });
 }
