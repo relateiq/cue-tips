@@ -5,20 +5,20 @@
   ],
   "basePath": "",
   "files": [
-    "src/**/*.spec.js"
+    "src/test/*.js"
   ],
   "browserify": {
     "debug": true
   },
   "preprocessors": {
-    "src/**/*.spec.js": "browserify"
+    "src/test/*.js": "browserify"
   },
   "autoWatch": true,
   "reporters": [
     "progress"
   ],
   "browsers": [
-    "PhantomJS"
+    "Chrome"
   ],
   "junitReporter": {
     "outputFile": "test_out/unit.xml",

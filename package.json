@@ -4,21 +4,28 @@
   "description": "",
   "main": "src/modules/index.js",
   "devDependencies": {
-    "browserify-istanbul": "~0.1.5",
-    "jasmine-core": "~2.3.4",
-    "karma": "~0.12.31",
-    "karma-browserify": "~4.3.0",
-    "karma-jasmine": "~0.3.6",
+    "browserify": "~12.0.1",
+    "browserify-istanbul": "~0.2.1",
     "chokidar-cli": "~1.0.1",
+    "connect-livereload": "~0.5.3",
+    "exorcist": "~0.4.0",
+    "express": "~4.13.3",
+    "jasmine": "~2.3.2",
+    "jasmine-core": "~2.3.4",
+    "karma": "~0.13.14",
+    "karma-browserify": "~4.4.0",
+    "karma-chrome-launcher": "~0.2.1",
+    "karma-jasmine": "~0.3.6",
+    "karma-phantomjs-launcher": "~0.2.1",
+    "node-sass": "~3.4.1",
+    "phantomjs": "~1.9.18",
+    "tiny-lr": "~0.2.1",
+    "watchify": "~3.6.0",
     "yargs": "~3.26.0"
   },
   "scripts": {
-    "test": "bin/iqb test",
-    "start": "bin/iqb start",
-    "preversion": "bin/iqb test"
-  },
-  "scripts": {
-    "test": "node_modules/karma/bin/karma start"
+    "test": "bin/iqb karma",
+    "preversion": "bin/iqb karma"
   },
   "author": "anthony.liatsis@gmail.com",
   "license": "MIT",
@@ -32,5 +39,8 @@
   "homepage": "https://github.com/relateiq/cue-tips#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
+  },
+  "iqproj": {
+    "app": true
   }
 }
