@@ -24,8 +24,8 @@
     "yargs": "~3.26.0"
   },
   "scripts": {
-    "test": "bin/iqb karma",
-    "preversion": "bin/iqb karma"
+    "test": "bin/iqb test",
+    "preversion": "bin/iqb test"
   },
   "author": "anthony.liatsis@gmail.com",
   "license": "MIT",
