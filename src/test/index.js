@@ -3,6 +3,7 @@ var DEFAULT_CUE_ATTR = 'cue-test';
 var DEFAULT_CUE_TIP_ATTR = 'cue-tip-test';
 var DEFAULT_PARENT_CLASS = 'parent-test-sltr';
 var DEFAULT_PARENT_SLTR = '.' + DEFAULT_PARENT_CLASS;
+var CUE_TIPS_CUE_CLASS = 'cue-tips-cue';
 
 describe('cue-tips', function() {
     beforeEach(function() {
@@ -169,7 +170,7 @@ describe('cue-tips', function() {
             var el = addCue();
 
             setTimeout(function() {
-                expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
                 done();
             });
         });
@@ -183,7 +184,7 @@ describe('cue-tips', function() {
             var el = addCue();
 
             setTimeout(function() {
-                expect(el.classList.contains('cue-tips-cue')).toBe(false);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(false);
                 done();
             });
         });
@@ -203,7 +204,7 @@ describe('cue-tips', function() {
             });
         });
 
-        it('should remove cue class when corresponding cueTipAttr is processed', function(done) {
+        it('should remove cue class from single element when corresponding cueTipAttr is processed', function(done) {
             cueTipsModule([{
                 cueAttr: DEFAULT_CUE_ATTR,
                 cueTipAttr: DEFAULT_CUE_TIP_ATTR
@@ -213,11 +214,35 @@ describe('cue-tips', function() {
 
             setTimeout(function() {
                 addCueTip();
-                expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
 
                 setTimeout(function() {
-                    expect(el.classList.contains('cue-tips-cue')).toBe(false);
+                    expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(false);
                     done();
+                });
+            });
+        });
+
+        it('should remove cue class from multiple elements when corresponding cueTipAttr is processed', function(done) {
+            cueTipsModule([{
+                cueAttr: DEFAULT_CUE_ATTR,
+                cueTipAttr: DEFAULT_CUE_TIP_ATTR
+            }], this.tipInterfaceMock);
+
+            var els = [addCue(), addCue()];
+            var elCheckCount = 0;
+
+            setTimeout(function() {
+                addCueTip();
+                els.forEach(function testEl(el) {
+                    expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
+
+                    setTimeout(function() {
+                        expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(false);
+                        if (++elCheckCount === els.length) {
+                            done();
+                        }
+                    });
                 });
             });
         });
@@ -261,7 +286,7 @@ describe('cue-tips', function() {
                 var el = addCue();
 
                 setTimeout(function() {
-                    expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                    expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
                     done();
                 });
             });
@@ -279,7 +304,7 @@ describe('cue-tips', function() {
                     addCueTip();
 
                     setTimeout(function() {
-                        expect(el.classList.contains('cue-tips-cue')).toBe(false);
+                        expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(false);
                         done();
                     });
                 });
@@ -295,7 +320,7 @@ describe('cue-tips', function() {
             var el = addCue();
 
             setTimeout(function() {
-                expect(el.classList.contains('cue-tips-cue')).toBe(false);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(false);
                 done();
             });
         });
@@ -312,7 +337,7 @@ describe('cue-tips', function() {
                 addCueTip();
 
                 setTimeout(function() {
-                    expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                    expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
                     done();
                 });
             });
@@ -328,7 +353,7 @@ describe('cue-tips', function() {
                 cueTipsModule([{
                     cueAttr: DEFAULT_CUE_ATTR
                 }], self.tipInterfaceMock);
-                expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
                 done();
             });
         });
@@ -345,7 +370,7 @@ describe('cue-tips', function() {
                 instance.add({
                     cueAttr: DEFAULT_CUE_ATTR
                 });
-                expect(el.classList.contains('cue-tips-cue')).toBe(true);
+                expect(el.classList.contains(CUE_TIPS_CUE_CLASS)).toBe(true);
                 done();
             });
         });

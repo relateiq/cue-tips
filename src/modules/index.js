@@ -144,13 +144,15 @@ function showCueTip(target, cueConfig, props) {
     }
 
     var cueSelector = ((cueConfig.cueParentSelector || '') + ' [' + cueConfig.cueAttr + ']').trim();
-    var cueEl = document.querySelector(cueSelector);
+    var cueEls = document.querySelectorAll(cueSelector);
     props.tipInterface.hideCueTargetTip(cueConfig);
     props.tipInterface.showCueTip(cueConfig, target);
     removeCueConfig(cueConfig, props);
 
-    if (cueEl) {
-        cueEl.classList.remove(CUE_TIPS_CUE_CLASS);
+    if (cueEls && cueEls.length) {
+        for (var i = 0; i < cueEls.length; i++) {
+            cueEls[i].classList.remove(CUE_TIPS_CUE_CLASS);
+        }
     }
 }
 
